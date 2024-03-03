@@ -58,7 +58,7 @@ class _CameraAppState extends State<CameraApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter Camera App'),
+        title: Text('WashedApp'),
       ),
       body: FutureBuilder(
         future: _initializeControllerFuture,
@@ -70,29 +70,54 @@ class _CameraAppState extends State<CameraApp> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.camera_alt),
-        onPressed: () async {
-          try {
-            await _initializeControllerFuture;
+      floatingActionButton: Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: FloatingActionButton(
+            onPressed: () async {
+              try {
+                await _initializeControllerFuture;
 
-            final path = join(
-              (await getTemporaryDirectory()).path,
-              '${DateTime.now()}.png',
-            );
+                final path = join(
+                  (await getTemporaryDirectory()).path,
+                  '${DateTime.now()}.png',
+                );
 
-            await _controller.takePicture();
+                // Poprawka: Przekazanie ścieżki do metody takePicture
+                await _controller.takePicture();
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(imagePath: path),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DisplayPictureScreen(imagePath: path),
+                  ),
+                );
+              } catch (e) {
+                print(e);
+              }
+            },
+            child: Container(
+              width: 60.0,
+              height: 60.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white,
+                  width: 4.0,
+                ),
               ),
-            );
-          } catch (e) {
-            print(e);
-          }
-        },
+              child: Center(
+                child: Icon(
+                  Icons.camera_alt,
+                  size: 32.0,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            backgroundColor: Colors.transparent, // Ustawienie koloru tła na przezroczysty
+          ),
+        ),
       ),
     );
   }
