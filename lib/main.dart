@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:path/path.dart' show join;
+import "package:path/path.dart" show join;
 import 'package:path_provider/path_provider.dart';
 
 void main() async {
@@ -15,7 +15,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   final CameraDescription camera;
 
-  const MyApp({Key? key, required this.camera}) : super(key: key);
+  const MyApp({super.key, required this.camera});
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +28,12 @@ class MyApp extends StatelessWidget {
 class CameraApp extends StatefulWidget {
   final CameraDescription camera;
 
-  const CameraApp({Key? key, required this.camera}) : super(key: key);
+  const CameraApp({super.key, required this.camera});
 
   @override
-  _CameraAppState createState() => _CameraAppState();
+  _CameraAppState createState() {
+    return _CameraAppState();
+  }
 }
 
 class _CameraAppState extends State<CameraApp> {
@@ -58,7 +60,7 @@ class _CameraAppState extends State<CameraApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('WashedApp'),
+        title: const Text('WashedApp'),
       ),
       body: FutureBuilder(
         future: _initializeControllerFuture,
@@ -66,14 +68,14 @@ class _CameraAppState extends State<CameraApp> {
           if (snapshot.connectionState == ConnectionState.done) {
             return CameraPreview(_controller);
           } else {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
         },
       ),
       floatingActionButton: Align(
         alignment: Alignment.bottomCenter,
         child: Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
+          padding: const EdgeInsets.only(bottom: 16.0, left: 35.0),
           child: FloatingActionButton(
             onPressed: () async {
               try {
@@ -84,7 +86,6 @@ class _CameraAppState extends State<CameraApp> {
                   '${DateTime.now()}.png',
                 );
 
-                // Poprawka: Przekazanie ścieżki do metody takePicture
                 await _controller.takePicture();
 
                 Navigator.push(
@@ -97,6 +98,7 @@ class _CameraAppState extends State<CameraApp> {
                 print(e);
               }
             },
+            backgroundColor: Colors.transparent,
             child: Container(
               width: 60.0,
               height: 60.0,
@@ -107,7 +109,7 @@ class _CameraAppState extends State<CameraApp> {
                   width: 4.0,
                 ),
               ),
-              child: Center(
+              child: const Center(
                 child: Icon(
                   Icons.camera_alt,
                   size: 32.0,
@@ -115,7 +117,7 @@ class _CameraAppState extends State<CameraApp> {
                 ),
               ),
             ),
-            backgroundColor: Colors.transparent, // Ustawienie koloru tła na przezroczysty
+
           ),
         ),
       ),
@@ -126,13 +128,12 @@ class _CameraAppState extends State<CameraApp> {
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
 
-  const DisplayPictureScreen({Key? key, required this.imagePath})
-      : super(key: key);
+  const DisplayPictureScreen({super.key, required this.imagePath});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Display the Picture')),
+      appBar: AppBar(title: const Text('Display the Picture')),
       body: Image.file(File(imagePath)),
     );
   }
