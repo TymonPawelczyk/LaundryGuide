@@ -83,7 +83,7 @@ class _CameraAppState extends State<CameraApp> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DisplayInfoScreen(),
+                    builder: (context) => const DisplayInfoScreen(),
                   ),
                 );
               } catch (e) {
