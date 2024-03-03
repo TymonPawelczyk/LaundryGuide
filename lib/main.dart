@@ -83,7 +83,12 @@ class _CameraAppState extends State<CameraApp> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const DisplayInfoScreen(),
+                    builder: (context) => const DisplayInfoScreen(itemsText: [
+                      "Prać w 40 stopniach z wirowaniem. ",
+                      "Można suszyć w suszarce mechanicznej w temperaturze 50 stopni.",
+                      "Prasować przy użyciu niskiej temperatury.",
+                    ],),
+
                   ),
                 );
               } catch (e) {
@@ -118,12 +123,12 @@ class _CameraAppState extends State<CameraApp> {
 }
 
 class DisplayInfoScreen extends StatelessWidget {
+  final List<String> itemsText; // Lista tekstów
 
-  const DisplayInfoScreen({super.key});
+  const DisplayInfoScreen({Key? key, required this.itemsText}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    const items = 4;
     return Scaffold(
       appBar: AppBar(title: const Text('Washing instructions')),
       body: LayoutBuilder(builder: (context, constraints) {
@@ -133,8 +138,8 @@ class DisplayInfoScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: List.generate(
-                  items, (index) => ItemWidget(text: 'Item $index')),
+              children: itemsText.map((text) => ItemWidget(text: text)).toList(),
+              // Tworzenie ItemWidget dla każdego tekstu
             ),
           ),
         );
@@ -142,19 +147,20 @@ class DisplayInfoScreen extends StatelessWidget {
     );
   }
 }
-class ItemWidget extends StatelessWidget {
-  const ItemWidget({
-    super.key,
-    required this.text,
-  });
 
+class ItemWidget extends StatelessWidget {
   final String text;
+
+  const ItemWidget({
+    Key? key,
+    required this.text,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: SizedBox(
-        height: 100,
+        height: 150,
         child: Center(child: Text(text)),
       ),
     );
