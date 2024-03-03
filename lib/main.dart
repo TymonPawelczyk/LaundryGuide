@@ -1,8 +1,5 @@
-//import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import "package:path/path.dart" show join;
-import 'package:path_provider/path_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -81,17 +78,12 @@ class _CameraAppState extends State<CameraApp> {
               try {
                 await _initializeControllerFuture;
 
-                final path = join(
-                  (await getTemporaryDirectory()).path,
-                  '${DateTime.now()}.png',
-                );
-
                 await _controller.takePicture();
 
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DisplayPictureScreen(imagePath: path),
+                    builder: (context) => DisplayInfoScreen(),
                   ),
                 );
               } catch (e) {
@@ -125,16 +117,15 @@ class _CameraAppState extends State<CameraApp> {
   }
 }
 
-class DisplayPictureScreen extends StatelessWidget {
-  final String imagePath;
+class DisplayInfoScreen extends StatelessWidget {
 
-  const DisplayPictureScreen({super.key, required this.imagePath});
+  const DisplayInfoScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Washing instructions')),
-      body:  Text('There will be instructions for washing here'),
+      body:  const Text('There will be instructions for washing here'),
     );
   }
 }
