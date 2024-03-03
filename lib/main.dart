@@ -1,4 +1,4 @@
-import 'dart:io';
+//import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import "package:path/path.dart" show join;
@@ -133,8 +133,8 @@ class DisplayPictureScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Display the Picture')),
-      body: Image.file(File(imagePath)),
+      appBar: AppBar(title: const Text('Washing instructions')),
+      body:  Text('There will be instructions for washing here'),
     );
   }
 }
