@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:http/http.dart' as http;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,7 +14,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   final CameraDescription camera;
 
-  const MyApp({super.key, required this.camera});
+  const MyApp({Key? key, required this.camera}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,7 @@ class MyApp extends StatelessWidget {
 class CameraApp extends StatefulWidget {
   final CameraDescription camera;
 
-  const CameraApp({super.key, required this.camera});
+  const CameraApp({Key? key, required this.camera}) : super(key: key);
 
   @override
   _CameraAppState createState() {
@@ -53,6 +55,32 @@ class _CameraAppState extends State<CameraApp> {
     super.dispose();
   }
 
+  Future<void> _sendImageToAPI(XFile imageFile) async {
+    final bytes = await imageFile.readAsBytes();
+    final String base64Image = base64Encode(bytes);
+
+    // Replace 'YOUR_API_URL' with the actual URL of your API
+    final apiUrl = 'https://detect.roboflow.com';
+    final apiKey = 'lKrd6w3ZzKhPQOGNdKfQ';
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey',
+        },
+        body: jsonEncode({'image': base64Image}),
+      );
+
+      // Handle response from API if needed
+      print(response.statusCode);
+      print(response.body);
+    } catch (e) {
+      print('Error sending image to API: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,17 +106,21 @@ class _CameraAppState extends State<CameraApp> {
               try {
                 await _initializeControllerFuture;
 
-                await _controller.takePicture();
+                final XFile imageFile = await _controller.takePicture();
+
+                // Send the taken picture to the API
+                await _sendImageToAPI(imageFile);
 
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const DisplayInfoScreen(itemsText: [
-                      "Prać w 40 stopniach z wirowaniem. ",
-                      "Można suszyć w suszarce mechanicznej w temperaturze 50 stopni.",
-                      "Prasować przy użyciu niskiej temperatury.",
-                    ],),
-
+                    builder: (context) => const DisplayInfoScreen(
+                      itemsText: [
+                        "Prać w 40 stopniach z wirowaniem. ",
+                        "Można suszyć w suszarce mechanicznej w temperaturze 50 stopni.",
+                        "Prasować przy użyciu niskiej temperatury.",
+                      ],
+                    ),
                   ),
                 );
               } catch (e) {
@@ -114,7 +146,6 @@ class _CameraAppState extends State<CameraApp> {
                 ),
               ),
             ),
-
           ),
         ),
       ),
