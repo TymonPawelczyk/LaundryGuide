@@ -56,19 +56,17 @@ class _CameraAppState extends State<CameraApp> {
   }
 
   Future<void> _sendImageToAPI(XFile imageFile) async {
-    final bytes = await imageFile.readAsBytes();
-    final String base64Image = base64Encode(bytes);
-
-    // Replace 'YOUR_API_URL' with the actual URL of your API
-    final apiUrl = 'https://detect.roboflow.com';
-    final apiKey = 'lKrd6w3ZzKhPQOGNdKfQ';
-
     try {
+      final bytes = await imageFile.readAsBytes();
+      final String base64Image = base64.encode(bytes);
+
+      final apiUrl = 'https://detect.roboflow.com';
+      final apiKey = 'yb6nqytNwYlGzTcZjzvn';
+
       final response = await http.post(
-        Uri.parse(apiUrl),
+        Uri.parse('$apiUrl/data1-bbgfd/2?api_key=$apiKey'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $apiKey',
         },
         body: jsonEncode({'image': base64Image}),
       );
@@ -110,19 +108,6 @@ class _CameraAppState extends State<CameraApp> {
 
                 // Send the taken picture to the API
                 await _sendImageToAPI(imageFile);
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DisplayInfoScreen(
-                      itemsText: [
-                        "Prać w 40 stopniach z wirowaniem. ",
-                        "Można suszyć w suszarce mechanicznej w temperaturze 50 stopni.",
-                        "Prasować przy użyciu niskiej temperatury.",
-                      ],
-                    ),
-                  ),
-                );
               } catch (e) {
                 print(e);
               }
@@ -148,51 +133,6 @@ class _CameraAppState extends State<CameraApp> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class DisplayInfoScreen extends StatelessWidget {
-  final List<String> itemsText; // Lista tekstów
-
-  const DisplayInfoScreen({Key? key, required this.itemsText}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Washing instructions')),
-      body: LayoutBuilder(builder: (context, constraints) {
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: itemsText.map((text) => ItemWidget(text: text)).toList(),
-              // Tworzenie ItemWidget dla każdego tekstu
-            ),
-          ),
-        );
-      }),
-    );
-  }
-}
-
-class ItemWidget extends StatelessWidget {
-  final String text;
-
-  const ItemWidget({
-    Key? key,
-    required this.text,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: SizedBox(
-        height: 150,
-        child: Center(child: Text(text)),
       ),
     );
   }
