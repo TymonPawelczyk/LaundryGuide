@@ -30,6 +30,7 @@ environment:
 
 assets:
     - assets/images_jpeg_jpg.rf.1d9b18607457518507d4820d32f904a0.jpg
+    - assets/photo.jpg
 
 dependencies:
   camera: ^0.10.0+2

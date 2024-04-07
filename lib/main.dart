@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 void main() async {
@@ -58,26 +59,56 @@ class _CameraAppState extends State<CameraApp> {
   Future<void> _sendImageToAPI(XFile imageFile) async {
     try {
       final bytes = await imageFile.readAsBytes();
-      final String base64Image = base64.encode(bytes);
+      final base64Image = base64.encode(bytes);
 
       final apiUrl = 'https://detect.roboflow.com';
       final apiKey = 'yb6nqytNwYlGzTcZjzvn';
 
-      final response = await http.post(
-        Uri.parse('$apiUrl/data1-bbgfd/2?api_key=$apiKey'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({'image': base64Image}),
-      );
+      final request = http.MultipartRequest('POST', Uri.parse('$apiUrl/data1-bbgfd/2?api_key=$apiKey'));
+      request.fields['image'] = base64Image;
 
-      // Handle response from API if needed
-      print(response.statusCode);
-      print(response.body);
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        // Handle successful response
+        print(responseBody);
+      } else {
+        // Handle error response
+        print('Error sending image to API: ${response.statusCode} - $responseBody');
+      }
     } catch (e) {
       print('Error sending image to API: $e');
     }
   }
+
+  Future<void> _sendAssetImageToAPI() async {
+    try {
+      final image = await rootBundle.load('assets/photo.jpg');
+      final bytes = image.buffer.asUint8List();
+      final base64Image = base64.encode(bytes);
+
+      final apiUrl = 'https://detect.roboflow.com';
+      final apiKey = 'yb6nqytNwYlGzTcZjzvn';
+
+      final request = http.MultipartRequest('POST', Uri.parse('$apiUrl/data1-bbgfd/2?api_key=$apiKey'));
+      request.fields['image'] = base64Image;
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        // Handle successful response
+        print(responseBody);
+      } else {
+        // Handle error response
+        print('Error sending image to API: ${response.statusCode} - $responseBody');
+      }
+    } catch (e) {
+      print('Error sending image to API: $e');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -95,44 +126,76 @@ class _CameraAppState extends State<CameraApp> {
           }
         },
       ),
-      floatingActionButton: Align(
-        alignment: Alignment.bottomCenter,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 16.0, left: 35.0),
-          child: FloatingActionButton(
-            onPressed: () async {
-              try {
-                await _initializeControllerFuture;
-
-                final XFile imageFile = await _controller.takePicture();
-
-                // Send the taken picture to the API
-                await _sendImageToAPI(imageFile);
-              } catch (e) {
-                print(e);
-              }
-            },
-            backgroundColor: Colors.transparent,
-            child: Container(
-              width: 60.0,
-              height: 60.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white,
-                  width: 4.0,
-                ),
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.camera_alt,
-                  size: 32.0,
-                  color: Colors.white,
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 16.0, left: 35.0),
+              child: FloatingActionButton(
+                onPressed: () async {
+                  try {
+                    await _initializeControllerFuture;
+                    final XFile imageFile = await _controller.takePicture();
+                    await _sendImageToAPI(imageFile);
+                  } catch (e) {
+                    print(e);
+                  }
+                },
+                backgroundColor: Colors.transparent,
+                child: Container(
+                  width: 60.0,
+                  height: 60.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 4.0,
+                    ),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.camera_alt,
+                      size: 32.0,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 16.0, left: 35.0),
+              child: FloatingActionButton(
+                onPressed: () async {
+                  await _sendAssetImageToAPI();
+                },
+                backgroundColor: Colors.transparent,
+                child: Container(
+                  width: 60.0,
+                  height: 60.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 4.0,
+                    ),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.photo_library,
+                      size: 32.0,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
